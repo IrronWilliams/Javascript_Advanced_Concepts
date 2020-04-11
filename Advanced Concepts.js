@@ -143,5 +143,294 @@ import getDateNow from './utils/date.js'
 
 if i tried to declare another variable, the multiple import statement will not be ignored. 
 
+
+KNOW WHAT 'THIS' IS AT ANY TIMES
+
+'this' is important and is present in virtually every context of the language. specifically 'this' is used when using methods of regular
+objects, referencing values within classes, or trying to access an element or event in the DOM. 
+
+'this' is a reference to an object. what makes 'this' tricky is the object that 'this' refers to can vary. the value for 'this' is 
+implicitly set according to how a function is called. 'this' is not a fixed characteristic of a function based upon the functions 
+definition, but rather a dynamic characteristic that is determined how a function is called. a function can be called in many ways:
+  arrow function
+  function declaration
+  normal function
+  method
+  function constructor
+  class
+  within a call back function 
+
+'this' is needed and important to understand.  one of the reasons why 'this' dynamically changes based upon how the function is called 
+is so that method calls on objects, which delegate thru the prototype chain, can still maintain the expected 'this' value. 'this' being 
+dynamic is essential for prototypical inheritance is essential for both constructor functions and classes to work as expected.
+
+there are 4 main contexts where 'this' is given a dynamically different value. the value of 'this' is determined by its context:
+1) in the global context
+2) as a method on an object
+3) as a constructor function or class constructor
+4) as a DOM event handler
+----------------------
+
+________________________________________________________________________________________________________
+1) in the global context:
+
+within an individual script you can figure out what 'this' is equal to by console logging 'this'. console.log(this). this always refers
+to an object. this will return the global object Window, which means working on windows object.  
+
+functions have their own context. function declarations will also refer to the global object Window.  
+function whatIsThis() {
+    console.log(this) 
+  }
+  whatIsThis()
+
+However this changes when in strict mode. when using strict mode, we get null/undefined for the 'this' value. 
+function whatIsThis() {
+  'use strict' 
+  console.log(this) 
+}
+whatIsThis() 
+
+it is better for 'this' to be undefined vs being assigned to the global window object. its very easy to mutate the global windows object.
+removing strict mode in this function, here we are really saying window.something = 2. although, this well return '2', its mutating
+the windows object. the scope of this function is leaking out to the outer scope which is the global window object. the scope leak 
+contradicts the purpose of having a function in the 1st place. whenever possible, always want code to be in strict mode. fortunately, 
+modules are in strict mode by default. 
+  function whatIsThis() {
+  //   console.log(this) 
+  this.something = 2 
+  console.log(something) 
+  }
+  whatIsThis() 
+________________________________________________________________________________________________________
+2) as a method on an object:
+
+when we have a function on an object, we have a method. this method uses 'this' to refer to properties of the object. if i wanted 
+the greetUser() method to greet user, will need to reference the first and last properties on it. can use the 'this' keyword to 
+accomplish. it i have a user object with some data, any method can use the 'this' keyword confidently, knowing its going to refer to 
+data on the object itself. calling the function will return the greeting as expected. 'Hi, Reed Barger'. 
+
+const user = {
+  first: 'Reed',
+  last: 'Barger',
+  greetUser() {
+    console.log(`Hi, ${this.first} ${this.last}`)   
+  }  
+}
+user.greetUser()
+
+
+if an object was nested inside another object. object userInfo has addtl piece of info for title and the user data was provided as a 
+nested object and therefore as a property of userInfo. to call the greetUser() function: -> userInfo.user.greetUser() will still return 
+'Hi, Reed Barger'. for any method, 'this' refers to the object that is on, in this case user. Or thought of another way, 'this' will refer
+to the object on the immediate left hand side of the dot when calling a method. in this case when calling greetUser(), the object user is 
+on the immediate left hand side of the dot.   
+const userInfo = {
+  title: "Programmer",
+  user: {
+     first: 'Reed',
+     last: 'Barger',
+     greetUser() {
+      console.log(`Hi, ${this.first} ${this.last}`)   
+     }   
+  }  
+}
+userInfo.user.greetUser()
+
+however if trying to access data from the userInfo object, such as the title, will get undefined. Hi, Reed Barger undefined. 'this' does 
+not refer to the parent object userInfo. although userInfo is on the immediate left side of dot, not calling userInfo as its not a method.
+
+const userInfo = {
+  title: "Programmer",
+  user: {
+     first: 'Reed',
+     last: 'Barger',
+     greetUser() {
+      console.log(`Hi, ${this.first} ${this.last} ${this.title}`)   
+     }   
+  }  
+}
+userInfo.user.greetUser()
+________________________________________________________________________________________________________
+3) as a constructor function or class constructor
+
+when using the 'new' keyword, it creates an instance of a class or constructor function. for example, have the class User, and for its 
+constructor method providing as instance properties first name of user and age and put them on 'this' as this.first = first, etc. there 
+is also a getAge() method on the class body which console logs the users name and age. when a class is instantiated with new, the 'this'
+keyword is bound to that instance. when providing name Bob and age to User and getting the created user (via variable user), we can use
+any class methods with confidence knowing it can refer to instance properties with the 'this' keyword. returns Bob age is 24
+
+class User {
+  constructor(first, age) {
+    this.first = first 
+    this.age = age   
+  }  
+  
+  getAge() {
+    console.log(`${this.first}'s age is ${this.age}`)   
+  }
+}
+const user = new User('Bob', 24) 
+user.getAge() 
+
+understanding classes work based off of constructor functions and prototypical inheritance. so the same rules also apply to separate 
+constructor functions. rewriting the class as a constructor function which includes adding a method to the prototype where if it was a 
+function declaration and had a 'this', will return the same expected results comparable to the class. returns jane's age is 25. 
+
+function User(first, age) {
+  this.first = first 
+  this.age = age 
+}
+
+User.prototype.getAge = function() {
+  console.log(`${this.first}'s age is ${this.age}`)   
+}
+const user2 = new User('jane', 25) 
+user2.getAge() 
+________________________________________________________________________________________________________
+4) as a DOM event handler
+
+in the browser there is a special 'this' context for event handlers. in an event handler called by addEventListener(), 'this' will refer
+to event.target. developers use event.target that they get from a given event from addEventListener(). programmers use event.target 
+to access elements in the DOM. since the 'this' reference changes in this context, its important to know what 'this' is referencing. 
+
+this example creates a button, stores in a variable called button. can do this by using the createElement() method from the document. 
+then give it the button the text content click. then add it to the document body. 
+
+then add an event listener to button to be able to click on it by using a click event. can use a function declaration to get the 
+event data, but console logging 'this' give me access to the button element. when clicking the button, what returned =  <button>
+
+  const button = document.createElement('button') 
+  button.textContent = "Click" 
+  document.body.appendChild(button) 
+
+  button.addEventListener('click', function() {
+    console.log(this) 
+  })
+________________________________________________________________________________________________________
+
+in the 4 examples, the value of 'this' was determined by its context. using some new functions (and some old), can explicitly determine
+what 'this' should refer to. these functions are:
+call()
+apply()
+bind()
+
+call() and apply() are similar in that they both allow to call a function on a certain context. say for example have a user object 
+consisting of user name and title. also have a function printUser() and relies on the 'this' context for this.name and this.title. 
+
+const user = {
+  name: "Reed",
+  title: "Programmer"  
+}
+
+function printUser() {
+  console.log(`${this.name} is a ${this.title}`) 
+}
+printUser.call(user) 
+printUser.apply(user)   //apply works just like call. 
+
+since 'this' refers to an object, need an object with the properties of first and title. which are in the user object. how do i connect
+the user object and printUser() function? how do i call printUser() with the user object data? can use call() for this. by using call() 
+the function and object are connected/have a relationship. its like the printUser() function has become a property of the user object. 
+call() allow me to dynamically set the 'this' context for the function. returns Reed is a Programmer
+  printUser.call(user)   -> passing in the user object. 
+
+
+to see how call() and apply() sets the 'this' context, whatever is passed to call() or apply() is what the this context will be set to 
+for a given function.  both call() and apply() will return -> {first: "Reed"}
+
+function whatIsThis() {
+  console.log(this) 
+}
+console.log(whatIsThis.call({ first: "Reed" }))  -> passing object. object will be set to 'this'
+console.log(whatIsThis.apply({ first: "Reed" })) 
+
+in this program, can pass user as the 'this' context because using this.name and this.title. after setting the 'this' context, can pass in 
+additional arguments to call(). can specifically pass in arguments for the city = London, country = England. this appropriately passes the 
+necessary arguments to the function. returns Reed is a Programmer in London, England.
+
+const user = {
+  name: "Reed",
+  title: "Programmer"  
+}
+
+function printBio(city, country) {
+  console.log(`${this.name} is a ${this.title} in ${city}, ${country}`) 
+}
+printBio.call(user, 'London', 'England') returns -> Reed is a Programmer in London, England
+printBio.apply(user, ['London', 'England'])  returns ->  Reed is a Programmer in London, England
+
+how you pass additional arguments is how apply() and call() differ. when passing arguments with apply(), need to pass the arguments not 
+set to 'this' as a single argument that is in an array. the array can take any number of elements and those elements will be provided as 
+separate arguments to the function that i am applying them to.  in summary, call() takes separate elements whereas as apply() takes any 
+further arguments as an array. 
+
+call() and apply() are one time use methods. meaning, i will need to use call(), apply() every time i call the function. to use a method
+repeatedly with the 'this' context of another object, can use the bind() function. bind() give a brand new function with an explicity 
+with an explicitly bound 'this'. so it will always be bound to the context i provide to it. so printUser() is always going to be bound
+and therefore have a 'this' context to the user object. so bind() returns a function that i can call as many times as i need. this 
+returns the same previous result -> Reed is a Programmer. 
+
+  const user = {
+    name: "Reed",
+    title: "Programmer"  
+  }
+
+  function printUser() {
+    console.log(`${this.name} is a ${this.title}`) 
+  }
+  const userDescription = printUser.bind(user) 
+  userDescription()
+
+benefit of bind() is that it will not allow me to bind to multiple 'this' contexts. this program initially binds printUser() function 
+to the to user object.  program later tries to bind printUser to the user2 object. when calling userDescription() function, will return
+Reed is a Programmer. this is good because it confirms that it is still bound to the 1st 'this' context used. so bind() is for good, 
+remains for the life of the program. 
+
+  const user = {
+    name: "Reed",
+    title: "Programmer"  
+  }
+
+  function printUser() {
+    console.log(`${this.name} is a ${this.title}`) 
+  }
+  const userDescription = printUser.bind(user) 
+
+  const user2 = {
+    name: "Doug",
+    title: "Entrepreneur"  
+  }
+  printUser.bind(user2)
+  userDescription() 
+
+arrow functions do not have their own 'this' binding. program has an object with a first property, a function declaration which has their 
+own 'this' to say 'this.first' on the object. also includes an arrow function as a method and console log this.first. calling user.fn()
+will return Bob, which is the property that i referred to off of the 'this', the object itself. 
+
+calling the arrow function will return null. arrow functions do not have their own 'this' binding. instead arrow functions go up the next 
+execution context. this arrow function will only work in the example of a nested object. 
+
+  const user = {
+    first: 'Bob',
+    fn() {
+      console.log(this.first)  
+    },
+    arrowFn: () => {
+      console.log(this.first)   
+    }
+  }
+ user.fn()     -> returns Bob
+ user.arrowFn()   -> returns null/undefined
+
+In summary, 4 different ways of calling a function that determines its 'this' binding. notes will help assess where 'this' is at all times.
+
+1) in the global context  -> (global Object or undefined in strict mode)
+2) as a method on an object  -> (object on left side of dot when method is called)
+3) as a constructor function or class constructor -> (the instance itself when called with new)
+4) as a DOM event handler ->  (the element itself)
+
+to help demistify what 'this' is:
+understand what 'this' is going to be dynamically set to whenever a given function is called. 
+use call(), apply() and bind() to manually set the 'this' context.  
 */
 
