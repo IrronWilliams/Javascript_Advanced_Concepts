@@ -4,10 +4,10 @@ the app to work. with the google keep clone, the data that i needed to keep trac
 what did i do with this value? i stored it in inputs and used it as i needed it. the form data that i used was 'state'. i also had to keep
 track of note data from other form submissions, including the title, text and id of each note which was stored in array. this was another
 piece of state. all the pieces of data i manage in the app as the user interacts with it form 'state'. state is important because it 
-tells me the status of the application. 
+tells me the status of the application. the benefit of state management is that it makes the state of the app, the invisible collection 
+of data visible. we make it visible by a making it a data structure where i can either get the values freed from state or update the 
+values set state at any time. 
 
-the benefit of state management is that it makes the state of the app, the invisible collection of data visible. we make it visible by a 
-making it a data structure where i can either get the values freed from state or update the values set state at any time. 
 the class App purpose is to greet a user if there is one. if there is no user, show message asking guest to sign in. app is showing one 
 or another message based on a given state, the user related state. the app is being run entirely by javascript. the render() method is 
 being called in the constructor, which is setting the innerHtml of the div with the id of root which comes from the html document. then 
@@ -56,15 +56,15 @@ class App {
 
 /*
 when i write my classes or any other data structure i use to organize my app, i want to manage my state to operate as my single source of 
-truth. meaning, if i want to figure out what the status of my app is at any moment, i look to where i store my state. the way that state 
+truth. meaning if i want to figure out what the status of my app is at any moment, i look to where i store my state. the way that state 
 is most consistently managed across popular javascript libraries is using objects. state in this class will live in a dedicated state
 object that will live at the top of the constructor. developers interested in knowing the state values i am keeping track of and matter
-for the class will look here.
+for the class will live here.
 
 in this app, i care if i have a user, (user state), because it informs which message will be shown. also care about if there is an error. 
 so there is a user related state and an error state. for the user state, i have a local user variable, const user = false. i can express
 this in the state object as a property called isAuth (short for is authenticated). isAuth will have the same possible states (true/false),
-user is authenticated or not. also will have an error piece of state. the error state will store an error message as a string. 
+whether user is authenticated or not. also will have an error piece of state. the error state will store an error message as a string. 
 
 since i want the state object to be single source of truth for the app, i want to rewrite the functionality of the code to rely on the
 values i have in state at any given point in time. to accomplish this, i want to 1st set state or update state accordingly. this is what 
@@ -78,6 +78,7 @@ now that i've made a copy, i can replace the old state with the new state:
 the same applies to the error text. previously there was an error text saying 'you must sign in'. similarly can copy the previous values of
 state into a new state object and set the error property to the message im providing to the textContent property, 'you must sign in':
   this.state = { ...this.state, error: "You must sign in!" }. 
+  
 can now get rid of the user messages entirely:
   this.$userMessage = document.getElementById("user-message") 
   this.$userMessage.textContent = "Welcome back!" 
@@ -101,12 +102,14 @@ class App {
   }
 
   checkAuth() {
-    const user = true 
+    const user = true //update boolean to change messages here
     if (user) {
-      this.state = { ...this.state, isAuth: true } 
+      //this.state.isAuth = true  //this will mutate state directly. 
+      this.state = { ...this.state, isAuth: true } //shallow clone of state object with the spread operator to get the previous state 
+                                                  //then update the value for isAuth is true. with copy, replace old state with new state
     //   this.$userMessage.textContent = "Welcome back!" 
     } else {
-      this.state = { ...this.state, error: "You must sign in!" } 
+      this.state = { ...this.state, error: "You must sign in!" } //applying clone approach for error
     //   this.$userMessage.textContent = "You must sign in!" 
     //   this.$userMessage.style.color = "red" 
     }
