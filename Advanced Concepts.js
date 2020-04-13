@@ -555,7 +555,7 @@ whenever a user wants to count up or down. in the function body want to return s
 increases by 1 every time.  to make it more clear, can update the argument from state to count and return count +1 for the count state:
 
     function counterReducer(count, action) {
-  return count + 1;  
+  return count + 1   
 }
 
 can provide the initial count value of 0. with this the return value should be 1. the following will return true.
@@ -574,7 +574,7 @@ property and the type is always a sting. convention is to make string uppercase.
   { type: 'INCREMENT' }
 
 to create a decrement action, change the type property of action object to decrement in all caps. 
-  { type: 'DECREMENT' };
+  { type: 'DECREMENT' } 
   
 
 for this to work will need to add additional logic within reducer to update state accordingly based upon the action type provided. can 
@@ -588,7 +588,7 @@ if none of the arguments match the cases. for default, return count, which is re
 in the initial count of 0. for action pass an object that will have a type of increment. the 1st statement runs the increment case and 
 increases count by 1. the 2nd statement decrements the current state by 1 resulting in final state of 0. 
   counterReducer(0, { type: 'INCREMENT' })
-  const result = counterReducer(1, { type: 'DECREMENT' }); // 0
+  const result = counterReducer(1, { type: 'DECREMENT' })  // 0
   console.log(result === 0)
 
 
@@ -628,7 +628,7 @@ previous state.
      case "CHANGE_NAME":
      case "CHANGE_EMAIL":
      default:
-       return state; 
+       return state  
   }  
 }
 
@@ -666,10 +666,46 @@ immutably, state is never changed directly. the reducer is responsible for creat
 conditionally update state within reducer with help of a switch() statement where switch is based on an action user wants to perform. in 
 addition, if state update requires more info, can provide an optional payload.
 
+AVOID IMPERATIVE. WRITE DECLARATIVE CODE
 
+there are 2 styles of writing code and a persons code usually does not fall into one category or the other. but this is how the styles are
+referred to generally. code can either be imperative or declarative. imperative code is when we write code more suitable for a computer.
+declarative code is code that a person would like to read, or code for people. imperative code is when we tell javascript what to do and
+how to do it. 
 
+for example, have an array of people and want to invite these people to a party by writing them an individual invitation. in addition 
+to people array, have an array that stores the invitations. to create these invitations, need to iterate over the people array. using a 
+for loop, iterate over the people array, get each element from array and add it to a message, then add the message to a new array. however,
+the code does not say the same message. by reading the code, the 1st iteration, the variable i is set to 0. then checking to see if i is 
+less than the current length of the array. then add 1 to i after the iteration. then interpolating the ith value of the array to a string 
+and putting it in the same index in a different array. this is all imperative, telling javascript exactly what to do and how to do it.
+the code is correct. it returns all of the created invitations. 
 
+the for loop is undeniably the most popular way to iterate over arrays. however, its imperative, hard to read and difficult to remember
+how to write even for experienced javascript developers.*/
+const people = ['Doug', 'Fred', 'Jane'] 
+const invitations = [] 
 
+for (let i = 0  i < people.length  i++) {
+    invitations[i] = `Hi ${people[i]}, come to my party!` 
+}
+console.log(invitations) //returns  ["Hi Doug, come to my party!", "Hi Fred, come to my party!", "Hi Jane, come to my party!"]
 
+/*
+declarative code is different. as the name implies, i declare with it what i want to accomplish and javascript will do it. declarative
+code is readable to humans and instructive to the computer. in fact, its readability to other developers is the priority. 
+
+to rewrite in declarative style, can take advantage of the numerous array methods. want app to send an invitation message to an array of 
+people. with declarative code, it all sits on one line, is far more comprehensible, vastly more succinct and clear at the same time. this
+is what pursuing a declarative code style will deliver.  
+
+unlike the imperative code, did not need to create confusing variables such as i or tell javascript to go thru the array. i just mapped, 
+or iterated over the array, added each persons name to the invitation and it was returned in a new array. 
+
+its best to pursue a declarative style because its more memorable and code is written for people not computers. scrutinize and re-read 
+my code for legibility and understanding just as if i was writing a essay. strive for practices that make my code more declarative. it 
+won't just help other programmers but myself as well especially when i revisit code years later after forgetting about what it does. 
 */
-
+const people = ['Doug', 'Fred', 'Jane'] 
+const invitations = people.map(person => `Hi ${person}, come to my party!`) 
+console.log(invitations) 

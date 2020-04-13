@@ -171,5 +171,10 @@ function userReducer(state, action) {
        return state  
   }  
 }
+/*
+passing the initialUser object. for the action, providing an object where the type is set to the action i want to
+perform, which is change_email. payload is email that user has changed/wants to use moving forward. this will 
+execute the reducer and change the email state. 
+*/
 const result = userReducer(initialUser, { type: 'CHANGE_EMAIL', payload: { email: 'mark@compuserve.com' } }) 
 console.log(result.email === 'mark@compuserve.com') 
